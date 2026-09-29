@@ -20,14 +20,12 @@
             background-color: #f8fafc;
         }
         
-        /* ピクセルアートをクッキリ表示するための設定 */
         .pixelated {
             image-rendering: pixelated;
             image-rendering: -moz-crisp-edges;
             image-rendering: crisp-edges;
         }
         
-        /* 透過キャンバスのチェッカーボード背景 */
         .canvas-container {
             background-image: 
                 linear-gradient(45deg, #cbd5e1 25%, transparent 25%), 
@@ -39,7 +37,6 @@
             background-color: #f1f5f9;
         }
 
-        /* カスタムスクロールバー */
         textarea::-webkit-scrollbar {
             width: 8px;
         }
@@ -59,7 +56,7 @@
 <body class="min-h-screen text-slate-800 p-4 md:p-8">
 
     <div class="max-w-6xl mx-auto">
-        <header class="mb-10 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-4">
+        <header class="mb-8 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-4">
             <div>
                 <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3 justify-center md:justify-start">
                     <i class="fa-solid fa-cubes text-indigo-600"></i>
@@ -77,44 +74,101 @@
             <!-- コントロールパネル -->
             <div class="col-span-1 bg-white p-6 md:p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col gap-6">
                 
+                <!-- 1. 画像選択 -->
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
                         <i class="fa-solid fa-image text-indigo-500"></i>
                         1. 画像を選択
                     </label>
-                    <label for="imageInput" class="block w-full border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50/50 transition-all group">
+                    <label for="imageInput" class="block w-full border-2 border-dashed border-slate-300 rounded-2xl p-5 text-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50/50 transition-all group">
                         <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-400 group-hover:text-indigo-500 mb-2 transition-colors"></i>
-                        <p class="text-sm font-medium text-slate-600 group-hover:text-indigo-600 transition-colors">クリックまたはドラッグ＆ドロップ</p>
+                        <p class="text-xs font-medium text-slate-600 group-hover:text-indigo-600 transition-colors">クリックまたはドラッグ＆ドロップ</p>
                         <input type="file" id="imageInput" accept="image/*" class="hidden" />
                     </label>
                     <p id="fileNameDisplay" class="text-xs text-slate-500 mt-2 text-center truncate"></p>
                 </div>
 
+                <!-- 2. 解像度 -->
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                    <label class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
                         <i class="fa-solid fa-ruler-horizontal text-indigo-500"></i>
-                        2. 解像度 (横幅のブロック数)
+                        2. 解像度 (横幅)
                     </label>
                     <div class="relative">
                         <input type="number" id="widthInput" value="100" min="10" max="500" 
-                            class="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white outline-none transition-all font-semibold text-slate-700" />
-                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm pointer-events-none">px</span>
+                            class="w-full pl-4 pr-12 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white outline-none transition-all font-semibold text-slate-700 text-sm" />
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-xs pointer-events-none">px</span>
                     </div>
-                    <p class="text-xs text-slate-500 mt-2"><i class="fa-solid fa-circle-info mr-1"></i> 縦幅は自動で計算されます。</p>
                 </div>
 
+                <!-- 3. 色マッチングアルゴリズム設定 (人間の目に近い選択) -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-eye text-indigo-500"></i>
+                        3. 色決定アルゴリズム
+                    </label>
+                    <select id="algoSelect" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
+                        <option value="ciede2000" selected>CIEDE2000 - 肌色・青グラデーションに最良 (最新規格)</option>
+                        <option value="cielab">CIELAB (CIE76) - 標準視覚補正</option>
+                        <option value="redmean">Redmean - 高速近似計算</option>
+                    </select>
+                    <p class="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
+                        <i class="fa-solid fa-circle-info mr-1 text-indigo-400"></i>
+                        <strong>CIEDE2000</strong>は青の色相補正と肌色（低彩度・ニュートラル域）の評価に特化した人間の目に最も近いアルゴリズムです。
+                    </p>
+                </div>
+
+                <!-- 4. ディザリング (グラデーション補正・強度・手法設定) -->
+                <div class="space-y-3 pt-1 border-t border-slate-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 flex items-center gap-2">
+                                <i class="fa-solid fa-border-none text-indigo-500"></i>
+                                ディザリング (Dithering)
+                            </label>
+                            <p class="text-[11px] text-slate-500 mt-0.5">色数の少なさを点描で自然に補正</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="ditherToggle" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        </label>
+                    </div>
+
+                    <!-- ディザリング詳細コントロール -->
+                    <div id="ditherControls" class="space-y-3 pl-1 pt-1">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-semibold text-slate-600">ディザリング方式</label>
+                            </div>
+                            <select id="ditherMethodSelect" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20">
+                                <option value="atkinson" selected>Atkinson (ノイズが少なく肌色・イラストに最適)</option>
+                                <option value="floyd">Floyd-Steinberg (全体を均一に誤差拡散)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-semibold text-slate-600">適用強度 (ざらつき調整)</label>
+                                <span id="ditherStrengthValue" class="text-xs font-bold text-indigo-600">40%</span>
+                            </div>
+                            <input type="range" id="ditherStrengthInput" min="0" max="100" value="40" 
+                                class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 変換ボタン -->
                 <button id="convertBtn" disabled 
-                    class="mt-auto w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-slate-300 disabled:to-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-bold py-4 px-4 rounded-xl transition-all shadow-lg shadow-indigo-200 disabled:shadow-none flex items-center justify-center gap-2 transform active:scale-[0.98]">
+                    class="mt-auto w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-slate-300 disabled:to-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-indigo-200 disabled:shadow-none flex items-center justify-center gap-2 transform active:scale-[0.98]">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                     変換してコードを生成
                 </button>
             </div>
 
-            <!-- プレビューエリア -->
             <div class="col-span-1 lg:col-span-2 bg-white p-6 md:p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col">
                 <div class="flex justify-between items-center mb-4">
                     <label class="block text-sm font-bold text-slate-700 flex items-center gap-2">
-                        <i class="fa-solid fa-eye text-indigo-500"></i>
+                        <i class="fa-solid fa-display text-indigo-500"></i>
                         プレビュー
                     </label>
                     <div id="stats" class="text-xs font-semibold bg-slate-100 text-slate-600 py-1.5 px-3 rounded-full hidden flex-wrap gap-3">
@@ -123,7 +177,7 @@
                     </div>
                 </div>
                 
-                <div class="flex-grow canvas-container rounded-2xl border border-slate-200 overflow-hidden flex items-center justify-center min-h-[300px] relative w-full">
+                <div class="flex-grow canvas-container rounded-2xl border border-slate-200 overflow-hidden flex items-center justify-center min-h-[320px] relative w-full">
                     <div id="placeholderText" class="text-slate-400 font-medium flex flex-col items-center gap-3 absolute z-0 pointer-events-none">
                         <i class="fa-regular fa-image text-4xl opacity-50"></i>
                         <p>画像を選択してください</p>
@@ -137,20 +191,20 @@
             
             <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 mb-6">
                 <h3 class="font-bold text-indigo-900 flex items-center gap-2 mb-2">
-                    <i class="fa-solid fa-book text-indigo-600"></i> 使い方
+                    <i class="fa-solid fa-book text-indigo-600"></i> Bloxd.io での使い方
                 </h3>
                 <ol class="list-decimal list-inside text-sm text-indigo-800 space-y-1 ml-1">
                     <li>下の <strong>「コードをコピー」</strong> ボタンをクリックします。</li>
-                    <li>Bloxd.ioのゲーム内で <strong>World Code</strong> にペーストして適用します。</li>
-                    <li>ゲームに入り、チャット欄を開いて <code>/generate</code> と入力して送信します。</li>
-                    <li>自分が立っている位置からブロックアートの生成が開始されます！</li>
+                    <li>Bloxd.ioのゲーム内で <strong>World Code</strong> にペーストして保存・適用します。</li>
+                    <li>ゲーム内に入り、チャットで <code>/generate</code> と打って送信します。</li>
+                    <li>自分の足元を起点にブロックアートの生成が始まります！</li>
                 </ol>
             </div>
 
             <div class="flex justify-between items-center mb-4">
                 <label class="block text-sm font-bold text-slate-700 flex items-center gap-2">
                     <i class="fa-solid fa-code text-indigo-500"></i>
-                    3. 展開用 World Code (JavaScript)
+                    展開用 World Code (JavaScript)
                 </label>
                 <button id="copyBtn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2">
                     <i class="fa-regular fa-copy"></i>
@@ -163,7 +217,7 @@
     </div>
 
     <script>
-        // 指定されたパレットデータ
+        // パレット定義 (肌色・自然色・青系の階調を補強)
         const rawPalette = {
             "#8c2621": "Red Concrete",
             "#d16e21": "Orange Concrete",
@@ -177,6 +231,7 @@
             "#3b9fbd": "Light Blue Concrete",
             "#1d7b7f": "Cyan Concrete",
             "#313685": "Blue Concrete",
+            "#1b2347": "Navy Concrete",
             "#705f2d": "Green Baked Clay",
             "#628086": "Light Blue Baked Clay",
             "#516e63": "Cyan Baked Clay",
@@ -212,9 +267,109 @@
             "#d7d6d0": "White Chalk",
             "#aca89f": "Light Gray Chalk",
             "#858681": "Gray Chalk",
-            "#72716c": "Black Chalk"
+            "#72716c": "Black Chalk",
+            // 肌色・ナチュラル・木目・クォーツ・テラコッタ系の色覚強化追加
+            "#f5e3d1": "Smooth Quartz",
+            "#e2c5a8": "Birch Planks",
+            "#d3a37b": "Oak Planks",
+            "#b87e56": "Jungle Planks",
+            "#eadaad": "Sand",
+            "#c88d66": "Terracotta"
         };
 
+        // 1. RGB (0-255) から CIELAB (L*, a*, b*) 色空間への変換
+        function rgbToLab(r, g, b) {
+            let rL = r / 255, gL = g / 255, bL = b / 255;
+            rL = rL > 0.04045 ? Math.pow((rL + 0.055) / 1.055, 2.4) : rL / 12.92;
+            gL = gL > 0.04045 ? Math.pow((gL + 0.055) / 1.055, 2.4) : gL / 12.92;
+            bL = bL > 0.04045 ? Math.pow((bL + 0.055) / 1.055, 2.4) : bL / 12.92;
+
+            let x = (rL * 0.4124 + gL * 0.3576 + bL * 0.1805) / 0.95047;
+            let y = (rL * 0.2126 + gL * 0.7152 + bL * 0.0722) / 1.00000;
+            let z = (rL * 0.0193 + gL * 0.1192 + bL * 0.9505) / 1.08883;
+
+            const f = (t) => t > 0.008856 ? Math.cbrt(t) : (7.787 * t) + (16 / 116);
+            const fx = f(x), fy = f(y), fz = f(z);
+
+            return {
+                l: (116 * fy) - 16,
+                a: 500 * (fx - fy),
+                b: 200 * (fy - fz)
+            };
+        }
+
+        // CIEDE2000 色差計算 (肌色・ニュートラル・青領域の歪みを補正する最高精度計算)
+        function deltaE2000(lab1, lab2) {
+            const L1 = lab1.l, a1 = lab1.a, b1 = lab1.b;
+            const L2 = lab2.l, a2 = lab2.a, b2 = lab2.b;
+
+            const avgL = (L1 + L2) / 2;
+            const C1 = Math.sqrt(a1 * a1 + b1 * b1);
+            const C2 = Math.sqrt(a2 * a2 + b2 * b2);
+            const avgC = (C1 + C2) / 2;
+
+            const avgC7 = Math.pow(avgC, 7);
+            const G = 0.5 * (1 - Math.sqrt(avgC7 / (avgC7 + Math.pow(25, 7))));
+
+            const a1p = a1 * (1 + G);
+            const a2p = a2 * (1 + G);
+
+            const C1p = Math.sqrt(a1p * a1p + b1 * b1);
+            const C2p = Math.sqrt(a2p * a2p + b2 * b2);
+            const avgCp = (C1p + C2p) / 2;
+
+            const h1p = (Math.atan2(b1, a1p) * 180 / Math.PI + 360) % 360;
+            const h2p = (Math.atan2(b2, a2p) * 180 / Math.PI + 360) % 360;
+
+            let avghp = 0;
+            if (Math.abs(h1p - h2p) > 180) {
+                avghp = (h1p + h2p + 360) / 2;
+            } else {
+                avghp = (h1p + h2p) / 2;
+            }
+
+            const T = 1 - 0.17 * Math.cos((avghp - 30) * Math.PI / 180)
+                        + 0.24 * Math.cos((2 * avghp) * Math.PI / 180)
+                        + 0.32 * Math.cos((3 * avghp + 6) * Math.PI / 180)
+                        - 0.20 * Math.cos((4 * avghp - 63) * Math.PI / 180);
+
+            let deltahp = h2p - h1p;
+            if (Math.abs(deltahp) > 180) {
+                if (h2p <= h1p) deltahp += 360;
+                else deltahp -= 360;
+            }
+
+            const deltaLp = L2 - L1;
+            const deltaCp = C2p - C1p;
+            const deltaHp = 2 * Math.sqrt(C1p * C2p) * Math.sin((deltahp / 2) * Math.PI / 180);
+
+            const Sl = 1 + (0.015 * Math.pow(avgL - 50, 2)) / Math.sqrt(20 + Math.pow(avgL - 50, 2));
+            const Sc = 1 + 0.045 * avgCp;
+            const Sh = 1 + 0.015 * avgCp * T;
+
+            const deltaTheta = 30 * Math.exp(-Math.pow((avghp - 275) / 25, 2));
+            const Rc = 2 * Math.sqrt(Math.pow(avgCp, 7) / (Math.pow(avgCp, 7) + Math.pow(25, 7)));
+            const Rt = -Math.sin((2 * deltaTheta) * Math.PI / 180) * Rc;
+
+            return Math.pow(deltaLp / Sl, 2) + Math.pow(deltaCp / Sc, 2) + Math.pow(deltaHp / Sh, 2) + Rt * (deltaCp / Sc) * (deltaHp / Sh);
+        }
+
+        // CIELAB Delta E (CIE76)
+        function getDeltaE(lab1, lab2) {
+            const dL = lab1.l - lab2.l;
+            const da = lab1.a - lab2.a;
+            const db = lab1.b - lab2.b;
+            return dL * dL + da * da + db * db;
+        }
+
+        // Redmean 色距離
+        function getRedmeanDistance(r1, g1, b1, r2, g2, b2) {
+            const rMean = (r1 + r2) / 2;
+            const r = r1 - r2, g = g1 - g2, b = b1 - b2;
+            return (2 + rMean / 256) * r * r + 4.0 * g * g + (2 + (255 - rMean) / 256) * b * b;
+        }
+
+        // パレット前処理
         const palette = [];
         const paletteNames = [];
         
@@ -222,13 +377,57 @@
             const r = parseInt(hex.slice(1, 3), 16);
             const g = parseInt(hex.slice(3, 5), 16);
             const b = parseInt(hex.slice(5, 7), 16);
-            palette.push({ index, name, r, g, b });
+            const lab = rgbToLab(r, g, b);
+            palette.push({ index, name, r, g, b, lab });
             paletteNames.push(name);
         });
 
+        // 最も近いパレットインデックスを取得
+        function getClosestPaletteIndex(r, g, b, algorithm = 'ciede2000') {
+            let minDistance = Infinity;
+            let closestIndex = 0;
+
+            if (algorithm === 'ciede2000') {
+                const targetLab = rgbToLab(r, g, b);
+                for (let i = 0; i < palette.length; i++) {
+                    const dist = deltaE2000(targetLab, palette[i].lab);
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        closestIndex = i;
+                    }
+                }
+            } else if (algorithm === 'cielab') {
+                const targetLab = rgbToLab(r, g, b);
+                for (let i = 0; i < palette.length; i++) {
+                    const dist = getDeltaE(targetLab, palette[i].lab);
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        closestIndex = i;
+                    }
+                }
+            } else {
+                for (let i = 0; i < palette.length; i++) {
+                    const p = palette[i];
+                    const dist = getRedmeanDistance(r, g, b, p.r, p.g, p.b);
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        closestIndex = i;
+                    }
+                }
+            }
+            return closestIndex;
+        }
+
+        // DOM要素
         const imageInput = document.getElementById('imageInput');
         const fileNameDisplay = document.getElementById('fileNameDisplay');
         const widthInput = document.getElementById('widthInput');
+        const algoSelect = document.getElementById('algoSelect');
+        const ditherToggle = document.getElementById('ditherToggle');
+        const ditherControls = document.getElementById('ditherControls');
+        const ditherMethodSelect = document.getElementById('ditherMethodSelect');
+        const ditherStrengthInput = document.getElementById('ditherStrengthInput');
+        const ditherStrengthValue = document.getElementById('ditherStrengthValue');
         const convertBtn = document.getElementById('convertBtn');
         const previewCanvas = document.getElementById('previewCanvas');
         const placeholderText = document.getElementById('placeholderText');
@@ -240,6 +439,19 @@
         const blocksStat = document.getElementById('blocksStat');
 
         let uploadedImage = null;
+
+        // ディザリングUI連動
+        ditherToggle.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                ditherControls.classList.remove('opacity-40', 'pointer-events-none');
+            } else {
+                ditherControls.classList.add('opacity-40', 'pointer-events-none');
+            }
+        });
+
+        ditherStrengthInput.addEventListener('input', (e) => {
+            ditherStrengthValue.textContent = `${e.target.value}%`;
+        });
 
         imageInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -253,7 +465,6 @@
                 img.onload = () => {
                     uploadedImage = img;
                     convertBtn.disabled = false;
-                    
                     placeholderText.innerHTML = `
                         <i class="fa-solid fa-wand-magic-sparkles text-4xl text-indigo-400 mb-2"></i>
                         <p class="text-indigo-600">「変換してコードを生成」をクリック</p>
@@ -264,49 +475,18 @@
             reader.readAsDataURL(file);
         });
 
-        // Redmean color distance (人間の目に近い色差計算)
-        function getColorDistance(r1, g1, b1, r2, g2, b2) {
-            const rMean = (r1 + r2) / 2;
-            const r = r1 - r2;
-            const g = g1 - g2;
-            const b = b1 - b2;
-            const weightR = 2 + rMean / 256;
-            const weightG = 4.0;
-            const weightB = 2 + (255 - rMean) / 256;
-            return (weightR * r * r) + (weightG * g * g) + (weightB * b * b);
-        }
-
-        // 最も近い色のインデックスを探す
-        function getClosestPaletteIndex(r, g, b) {
-            let minDistance = Infinity;
-            let closestIndex = 0;
-            
-            for (let i = 0; i < palette.length; i++) {
-                const p = palette[i];
-                const distance = getColorDistance(r, g, b, p.r, p.g, p.b);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestIndex = i;
-                }
-            }
-            return closestIndex;
-        }
-
         convertBtn.addEventListener('click', () => {
             if (!uploadedImage) return;
 
-            // 1. サイズの計算 (縦横比を維持)
             const targetWidth = parseInt(widthInput.value, 10) || 100;
             const aspectRatio = uploadedImage.height / uploadedImage.width;
             const targetHeight = Math.round(targetWidth * aspectRatio);
 
-            // 2. オフスクリーンキャンバスで画像をリサイズ
             const offscreenCanvas = document.createElement('canvas');
             offscreenCanvas.width = targetWidth;
             offscreenCanvas.height = targetHeight;
             const ctx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
             
-            // 白背景で塗りつぶす (透過ピクセル対策)
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, targetWidth, targetHeight);
             ctx.drawImage(uploadedImage, 0, 0, targetWidth, targetHeight);
@@ -314,32 +494,86 @@
             const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight);
             const data = imageData.data;
 
-            // プレビュー用キャンバスの設定
+            const pixels = new Float32Array(targetWidth * targetHeight * 3);
+            for (let i = 0; i < targetWidth * targetHeight; i++) {
+                const alpha = data[i * 4 + 3] / 255;
+                pixels[i * 3]     = data[i * 4] * alpha + 255 * (1 - alpha);
+                pixels[i * 3 + 1] = data[i * 4 + 1] * alpha + 255 * (1 - alpha);
+                pixels[i * 3 + 2] = data[i * 4 + 2] * alpha + 255 * (1 - alpha);
+            }
+
+            const algo = algoSelect.value;
+            const useDithering = ditherToggle.checked;
+            const ditherMethod = ditherMethodSelect.value;
+            const strengthFactor = (parseInt(ditherStrengthInput.value, 10) / 100);
+
+            const indexArray = new Array(targetWidth * targetHeight);
+
             previewCanvas.width = targetWidth;
             previewCanvas.height = targetHeight;
             const previewCtx = previewCanvas.getContext('2d');
             const previewImageData = previewCtx.createImageData(targetWidth, targetHeight);
             const pData = previewImageData.data;
 
-            // データ圧縮用配列
-            const indexArray = [];
+            for (let y = 0; y < targetHeight; y++) {
+                for (let x = 0; x < targetWidth; x++) {
+                    const idx = y * targetWidth + x;
+                    const pIdx = idx * 3;
 
-            // 3. 各ピクセルの色をパレットの近似色に置き換え
-            for (let i = 0; i < data.length; i += 4) {
-                const alpha = data[i + 3] / 255;
-                const r = Math.round(data[i] * alpha + 255 * (1 - alpha));
-                const g = Math.round(data[i + 1] * alpha + 255 * (1 - alpha));
-                const b = Math.round(data[i + 2] * alpha + 255 * (1 - alpha));
+                    const curR = Math.min(255, Math.max(0, pixels[pIdx]));
+                    const curG = Math.min(255, Math.max(0, pixels[pIdx + 1]));
+                    const curB = Math.min(255, Math.max(0, pixels[pIdx + 2]));
 
-                const closestIndex = getClosestPaletteIndex(r, g, b);
-                indexArray.push(closestIndex);
+                    const closestIndex = getClosestPaletteIndex(curR, curG, curB, algo);
+                    indexArray[idx] = closestIndex;
 
-                // プレビュー用のデータに反映
-                const selectedColor = palette[closestIndex];
-                pData[i] = selectedColor.r;
-                pData[i + 1] = selectedColor.g;
-                pData[i + 2] = selectedColor.b;
-                pData[i + 3] = 255;
+                    const selectedColor = palette[closestIndex];
+
+                    const outIdx = idx * 4;
+                    pData[outIdx]     = selectedColor.r;
+                    pData[outIdx + 1] = selectedColor.g;
+                    pData[outIdx + 2] = selectedColor.b;
+                    pData[outIdx + 3] = 255;
+
+                    // スマートディザリング (強度の制御 & エッジの誤差飛散防止)
+                    if (useDithering && strengthFactor > 0) {
+                        let errR = (curR - selectedColor.r) * strengthFactor;
+                        let errG = (curG - selectedColor.g) * strengthFactor;
+                        let errB = (curB - selectedColor.b) * strengthFactor;
+
+                        // 急激な輪郭線からの誤差拡散をクランプしてノイズの飛び散りを防ぐ
+                        const maxErr = 45;
+                        errR = Math.max(-maxErr, Math.min(maxErr, errR));
+                        errG = Math.max(-maxErr, Math.min(maxErr, errG));
+                        errB = Math.max(-maxErr, Math.min(maxErr, errB));
+
+                        const distributeError = (nx, ny, weight) => {
+                            if (nx >= 0 && nx < targetWidth && ny >= 0 && ny < targetHeight) {
+                                const nIdx = (ny * targetWidth + nx) * 3;
+                                pixels[nIdx]     += errR * weight;
+                                pixels[nIdx + 1] += errG * weight;
+                                pixels[nIdx + 2] += errB * weight;
+                            }
+                        };
+
+                        if (ditherMethod === 'atkinson') {
+                            // Atkinson方式: 誤差の75%のみを近傍に拡散し、25%を吸収（肌色やキャラクターイラストに最適な滑らかさ）
+                            const w = 1 / 8;
+                            distributeError(x + 1, y,     w);
+                            distributeError(x + 2, y,     w);
+                            distributeError(x - 1, y + 1, w);
+                            distributeError(x,     y + 1, w);
+                            distributeError(x + 1, y + 1, w);
+                            distributeError(x,     y + 2, w);
+                        } else {
+                            // Floyd-Steinberg方式
+                            distributeError(x + 1, y,     7 / 16);
+                            distributeError(x - 1, y + 1, 3 / 16);
+                            distributeError(x,     y + 1, 5 / 16);
+                            distributeError(x + 1, y + 1, 1 / 16);
+                        }
+                    }
+                }
             }
 
             // プレビュー描画
@@ -352,7 +586,7 @@
             sizeStat.innerHTML = `<i class="fa-solid fa-expand mr-1"></i> ${targetWidth}w x ${targetHeight}h`;
             blocksStat.innerHTML = `<i class="fa-solid fa-cubes mr-1"></i> ${(targetWidth * targetHeight).toLocaleString()}`;
 
-            // 4. RLE (ランレングス) 圧縮
+            // RLE 圧縮
             const rleEncoded = [];
             let currentId = indexArray[0];
             let count = 1;
@@ -369,7 +603,7 @@
             rleEncoded.push(`${currentId.toString(36)}:${count.toString(36)}`);
             const compressedString = rleEncoded.join(',');
 
-            // 5. World Code テンプレートとの結合
+            // World Code 生成
             const generatedCode = `// ==============================
 // Block Art Generator Data
 // ==============================
@@ -380,11 +614,11 @@ const BlockArtData = (function() {
     // ブロックパレット (${paletteNames.length}色)
     const palette = ${JSON.stringify(paletteNames)};
     
-    // RLE圧縮されたデータ (36進数エンコード)
+    // RLE圧縮データ (36進数エンコード)
     const data = "${compressedString}";
 
     /**
-     * 圧縮されたデータを展開し、全ピクセルのブロック名配列を返します。
+     * 圧縮データを展開し、全ピクセルのブロック名配列を返します。
      */
     function decompress() {
         const pixels = [];
@@ -423,7 +657,7 @@ let originX = 0;
 let originY = 0;
 let originZ = 0;
 
-// 1 tickあたりの生成数 (サーバー負荷に応じて調整可能)
+// 1 tickあたりの生成数
 const BLOCKS_PER_TICK = 100;
 
 // ==============================
@@ -431,18 +665,13 @@ const BLOCKS_PER_TICK = 100;
 // ==============================
 playerCommand = (playerId, cmd) => {
     if (cmd === "generate") {
-        
-        // アートデータ取得
         artData = BlockArtData.getDecompressedData();
-        
-        // プレイヤー位置
         const pos = api.getPosition(playerId);
         
         originX = Math.floor(pos[0]);
         originY = Math.floor(pos[1]);
         originZ = Math.floor(pos[2]);
         
-        // 生成開始
         generateIndex = 0;
         generating = true;
         
@@ -466,30 +695,15 @@ tick = () => {
     const pixels = artData.pixels;
     
     const total = width * height;
-    
-    const end = Math.min(
-        generateIndex + BLOCKS_PER_TICK,
-        total
-    );
+    const end = Math.min(generateIndex + BLOCKS_PER_TICK, total);
 
     for (; generateIndex < end; generateIndex++) {
-        
         const pixel = pixels[generateIndex];
+        if (!pixel) continue;
         
-        // 透明ピクセルの判定
-        if (
-            pixel === null ||
-            pixel === undefined ||
-            pixel === ""
-        ) {
-            continue;
-        }
-        
-        // 左上 → 右下 の順に配置
         const px = generateIndex % width;
         const pz = Math.floor(generateIndex / width);
         
-        // X-Z平面に配置 (地面に描画)
         const x = originX + px;
         const y = originY;
         const z = originZ + pz;
@@ -497,7 +711,6 @@ tick = () => {
         api.setBlock(x, y, z, pixel);
     }
     
-    // 完了判定
     if (generateIndex >= total) {
         generating = false;
         artData = null;
@@ -508,19 +721,17 @@ tick = () => {
             outputCode.value = generatedCode;
             outputSection.classList.remove('hidden');
             
-            // スムーズスクロールで結果エリアへ
             setTimeout(() => {
                 outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 100);
         });
 
-        // コピーボタン処理
+        // コピー機能
         copyBtn.addEventListener('click', () => {
             outputCode.select();
             document.execCommand('copy');
-            window.getSelection().removeAllRanges(); // 選択状態を解除
+            window.getSelection().removeAllRanges();
             
-            // ボタンの見た目変更 (成功状態)
             const originalHTML = copyBtn.innerHTML;
             copyBtn.innerHTML = `<i class="fa-solid fa-check"></i> コピーしました!`;
             copyBtn.classList.remove('bg-slate-100', 'text-slate-700', 'hover:bg-slate-200');
@@ -533,5 +744,4 @@ tick = () => {
             }, 2500);
         });
     </script>
-</body>
-</html>
+<!-- ... existing code -->
