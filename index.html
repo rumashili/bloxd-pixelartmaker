@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloxd Block Art Generator</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        /* ピクセルアートをクッキリ表示するための設定 */
+        .pixelated {
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+        
+        /* 透過キャンバスのチェッカーボード背景 */
+        .canvas-container {
+            background-image: 
+                linear-gradient(45deg, #cbd5e1 25%, transparent 25%), 
+                linear-gradient(-45deg, #cbd5e1 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #cbd5e1 75%), 
+                linear-gradient(-45deg, transparent 75%, #cbd5e1 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            background-color: #f1f5f9;
+        }
+
+        /* カスタムスクロールバー */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #1e293b; 
+            border-radius: 8px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #475569; 
+            border-radius: 8px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #64748b; 
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-10 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3 justify-center md:justify-start">
+                    <i class="fa-solid fa-cubes text-indigo-600"></i>
+                    Bloxd Block Art Generator
+                </h1>
+                <p class="text-slate-600 mt-2 font-medium">画像をブロックに変換し、Bloxd.io用のWorld Codeを出力します。</p>
+            </div>
+            <a href="https://github.com/" target="_blank" class="text-slate-400 hover:text-slate-700 transition-colors">
+                <i class="fa-brands fa-github text-3xl"></i>
+            </a>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- コントロールパネル -->
+            <div class="col-span-1 bg-white p-6 md:p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col gap-6">
+                
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-image text-indigo-500"></i>
+                        1. 画像を選択
+                    </label>
+                    <label for="imageInput" class="block w-full border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50/50 transition-all group">
+                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-400 group-hover:text-indigo-500 mb-2 transition-colors"></i>
+                        <p class="text-sm font-medium text-slate-600 group-hover:text-indigo-600 transition-colors">クリックまたはドラッグ＆ドロップ</p>
+                        <input type="file" id="imageInput" accept="image/*" class="hidden" />
+                    </label>
+                    <p id="fileNameDisplay" class="text-xs text-slate-500 mt-2 text-center truncate"></p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-ruler-horizontal text-indigo-500"></i>
+                        2. 解像度 (横幅のブロック数)
+                    </label>
+                    <div class="relative">
+                        <input type="number" id="widthInput" value="100" min="10" max="500" 
+                            class="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white outline-none transition-all font-semibold text-slate-700" />
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm pointer-events-none">px</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2"><i class="fa-solid fa-circle-info mr-1"></i> 縦幅は自動で計算されます。</p>
+                </div>
+
+                <button id="convertBtn" disabled 
+                    class="mt-auto w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-slate-300 disabled:to-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-bold py-4 px-4 rounded-xl transition-all shadow-lg shadow-indigo-200 disabled:shadow-none flex items-center justify-center gap-2 transform active:scale-[0.98]">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    変換してコードを生成
+                </button>
+            </div>
+
+            <!-- プレビューエリア -->
+            <div class="col-span-1 lg:col-span-2 bg-white p-6 md:p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <label class="block text-sm font-bold text-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-eye text-indigo-500"></i>
+                        プレビュー
+                    </label>
+                    <div id="stats" class="text-xs font-semibold bg-slate-100 text-slate-600 py-1.5 px-3 rounded-full hidden flex-wrap gap-3">
+                        <span id="sizeStat"><i class="fa-solid fa-expand mr-1"></i> - x -</span>
+                        <span id="blocksStat"><i class="fa-solid fa-cubes mr-1"></i> -</span>
+                    </div>
+                </div>
+                
+                <div class="flex-grow canvas-container rounded-2xl border border-slate-200 overflow-hidden flex items-center justify-center min-h-[300px] relative w-full">
+                    <div id="placeholderText" class="text-slate-400 font-medium flex flex-col items-center gap-3 absolute z-0 pointer-events-none">
+                        <i class="fa-regular fa-image text-4xl opacity-50"></i>
+                        <p>画像を選択してください</p>
+                    </div>
+                    <canvas id="previewCanvas" class="pixelated max-w-full max-h-[500px] object-contain relative z-10 hidden drop-shadow-md"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="outputSection" class="mt-8 bg-white p-6 md:p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 hidden animate-fade-in-up">
+            
+            <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 mb-6">
+                <h3 class="font-bold text-indigo-900 flex items-center gap-2 mb-2">
+                    <i class="fa-solid fa-book text-indigo-600"></i> 使い方
+                </h3>
+                <ol class="list-decimal list-inside text-sm text-indigo-800 space-y-1 ml-1">
+                    <li>下の <strong>「コードをコピー」</strong> ボタンをクリックします。</li>
+                    <li>Bloxd.ioのゲーム内で <strong>World Code</strong> にペーストして適用します。</li>
+                    <li>ゲームに入り、チャット欄を開いて <code>/generate</code> と入力して送信します。</li>
+                    <li>自分が立っている位置からブロックアートの生成が開始されます！</li>
+                </ol>
+            </div>
+
+            <div class="flex justify-between items-center mb-4">
+                <label class="block text-sm font-bold text-slate-700 flex items-center gap-2">
+                    <i class="fa-solid fa-code text-indigo-500"></i>
+                    3. 展開用 World Code (JavaScript)
+                </label>
+                <button id="copyBtn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2">
+                    <i class="fa-regular fa-copy"></i>
+                    コードをコピー
+                </button>
+            </div>
+            
+            <textarea id="outputCode" readonly class="w-full h-80 bg-slate-900 text-emerald-400 font-mono text-sm p-5 rounded-2xl outline-none resize-y border border-slate-800 focus:ring-2 focus:ring-indigo-500 shadow-inner"></textarea>
+        </div>
+    </div>
+
+    <script>
+        // 指定されたパレットデータ
+        const rawPalette = {
+            "#8c2621": "Red Concrete",
+            "#d16e21": "Orange Concrete",
+            "#dbb33a": "Yellow Concrete",
+            "#6fa724": "Lime Concrete",
+            "#933f30": "Red Baked Clay",
+            "#ba652b": "Orange Baked Clay",
+            "#bc8a38": "Yellow Baked Clay",
+            "#80872d": "Lime Baked Clay",
+            "#4f6321": "Green Concrete",
+            "#3b9fbd": "Light Blue Concrete",
+            "#1d7b7f": "Cyan Concrete",
+            "#313685": "Blue Concrete",
+            "#705f2d": "Green Baked Clay",
+            "#628086": "Light Blue Baked Clay",
+            "#516e63": "Cyan Baked Clay",
+            "#60486a": "Blue Baked Clay",
+            "#6b2793": "Purple Concrete",
+            "#a34099": "Magenta Concrete",
+            "#d1819c": "Pink Concrete",
+            "#644229": "Brown Concrete",
+            "#804071": "Purple Baked Clay",
+            "#9f4c75": "Magenta Baked Clay",
+            "#b86f72": "Pink Baked Clay",
+            "#7c4e34": "Brown Baked Clay",
+            "#d4d4d4": "White Concrete",
+            "#7f807a": "Light Gray Concrete",
+            "#3b4043": "Gray Concrete",
+            "#141519": "Black Concrete",
+            "#b69c90": "White Baked Clay",
+            "#8c7060": "Light Gray Baked Clay",
+            "#664e44": "Gray Baked Clay",
+            "#53382f": "Black Baked Clay",
+            "#b2776d": "Red Chalk",
+            "#d79b67": "Orange Chalk",
+            "#d9c071": "Yellow Chalk",
+            "#9fbe69": "Lime Chalk",
+            "#90996b": "Green Chalk",
+            "#80b8c3": "Light Blue Chalk",
+            "#70a6a1": "Cyan Chalk",
+            "#8181a8": "Blue Chalk",
+            "#a177ae": "Purple Chalk",
+            "#bf83b0": "Magenta Chalk",
+            "#d7a6ad": "Pink Chalk",
+            "#9d8771": "Brown Chalk",
+            "#d7d6d0": "White Chalk",
+            "#aca89f": "Light Gray Chalk",
+            "#858681": "Gray Chalk",
+            "#72716c": "Black Chalk"
+        };
+
+        const palette = [];
+        const paletteNames = [];
+        
+        Object.entries(rawPalette).forEach(([hex, name], index) => {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            palette.push({ index, name, r, g, b });
+            paletteNames.push(name);
+        });
+
+        const imageInput = document.getElementById('imageInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const widthInput = document.getElementById('widthInput');
+        const convertBtn = document.getElementById('convertBtn');
+        const previewCanvas = document.getElementById('previewCanvas');
+        const placeholderText = document.getElementById('placeholderText');
+        const outputSection = document.getElementById('outputSection');
+        const outputCode = document.getElementById('outputCode');
+        const copyBtn = document.getElementById('copyBtn');
+        const stats = document.getElementById('stats');
+        const sizeStat = document.getElementById('sizeStat');
+        const blocksStat = document.getElementById('blocksStat');
+
+        let uploadedImage = null;
+
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            fileNameDisplay.textContent = file.name;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    uploadedImage = img;
+                    convertBtn.disabled = false;
+                    
+                    placeholderText.innerHTML = `
+                        <i class="fa-solid fa-wand-magic-sparkles text-4xl text-indigo-400 mb-2"></i>
+                        <p class="text-indigo-600">「変換してコードを生成」をクリック</p>
+                    `;
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Redmean color distance (人間の目に近い色差計算)
+        function getColorDistance(r1, g1, b1, r2, g2, b2) {
+            const rMean = (r1 + r2) / 2;
+            const r = r1 - r2;
+            const g = g1 - g2;
+            const b = b1 - b2;
+            const weightR = 2 + rMean / 256;
+            const weightG = 4.0;
+            const weightB = 2 + (255 - rMean) / 256;
+            return (weightR * r * r) + (weightG * g * g) + (weightB * b * b);
+        }
+
+        // 最も近い色のインデックスを探す
+        function getClosestPaletteIndex(r, g, b) {
+            let minDistance = Infinity;
+            let closestIndex = 0;
+            
+            for (let i = 0; i < palette.length; i++) {
+                const p = palette[i];
+                const distance = getColorDistance(r, g, b, p.r, p.g, p.b);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestIndex = i;
+                }
+            }
+            return closestIndex;
+        }
+
+        convertBtn.addEventListener('click', () => {
+            if (!uploadedImage) return;
+
+            // 1. サイズの計算 (縦横比を維持)
+            const targetWidth = parseInt(widthInput.value, 10) || 100;
+            const aspectRatio = uploadedImage.height / uploadedImage.width;
+            const targetHeight = Math.round(targetWidth * aspectRatio);
+
+            // 2. オフスクリーンキャンバスで画像をリサイズ
+            const offscreenCanvas = document.createElement('canvas');
+            offscreenCanvas.width = targetWidth;
+            offscreenCanvas.height = targetHeight;
+            const ctx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
+            
+            // 白背景で塗りつぶす (透過ピクセル対策)
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, targetWidth, targetHeight);
+            ctx.drawImage(uploadedImage, 0, 0, targetWidth, targetHeight);
+
+            const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight);
+            const data = imageData.data;
+
+            // プレビュー用キャンバスの設定
+            previewCanvas.width = targetWidth;
+            previewCanvas.height = targetHeight;
+            const previewCtx = previewCanvas.getContext('2d');
+            const previewImageData = previewCtx.createImageData(targetWidth, targetHeight);
+            const pData = previewImageData.data;
+
+            // データ圧縮用配列
+            const indexArray = [];
+
+            // 3. 各ピクセルの色をパレットの近似色に置き換え
+            for (let i = 0; i < data.length; i += 4) {
+                const alpha = data[i + 3] / 255;
+                const r = Math.round(data[i] * alpha + 255 * (1 - alpha));
+                const g = Math.round(data[i + 1] * alpha + 255 * (1 - alpha));
+                const b = Math.round(data[i + 2] * alpha + 255 * (1 - alpha));
+
+                const closestIndex = getClosestPaletteIndex(r, g, b);
+                indexArray.push(closestIndex);
+
+                // プレビュー用のデータに反映
+                const selectedColor = palette[closestIndex];
+                pData[i] = selectedColor.r;
+                pData[i + 1] = selectedColor.g;
+                pData[i + 2] = selectedColor.b;
+                pData[i + 3] = 255;
+            }
+
+            // プレビュー描画
+            previewCtx.putImageData(previewImageData, 0, 0);
+            previewCanvas.classList.remove('hidden');
+            placeholderText.classList.add('hidden');
+            stats.classList.remove('hidden');
+            stats.classList.add('flex');
+            
+            sizeStat.innerHTML = `<i class="fa-solid fa-expand mr-1"></i> ${targetWidth}w x ${targetHeight}h`;
+            blocksStat.innerHTML = `<i class="fa-solid fa-cubes mr-1"></i> ${(targetWidth * targetHeight).toLocaleString()}`;
+
+            // 4. RLE (ランレングス) 圧縮
+            const rleEncoded = [];
+            let currentId = indexArray[0];
+            let count = 1;
+
+            for (let i = 1; i < indexArray.length; i++) {
+                if (indexArray[i] === currentId) {
+                    count++;
+                } else {
+                    rleEncoded.push(`${currentId.toString(36)}:${count.toString(36)}`);
+                    currentId = indexArray[i];
+                    count = 1;
+                }
+            }
+            rleEncoded.push(`${currentId.toString(36)}:${count.toString(36)}`);
+            const compressedString = rleEncoded.join(',');
+
+            // 5. World Code テンプレートとの結合
+            const generatedCode = `// ==============================
+// Block Art Generator Data
+// ==============================
+const BlockArtData = (function() {
+    const width = ${targetWidth};
+    const height = ${targetHeight};
+    
+    // ブロックパレット (${paletteNames.length}色)
+    const palette = ${JSON.stringify(paletteNames)};
+    
+    // RLE圧縮されたデータ (36進数エンコード)
+    const data = "${compressedString}";
+
+    /**
+     * 圧縮されたデータを展開し、全ピクセルのブロック名配列を返します。
+     */
+    function decompress() {
+        const pixels = [];
+        const parts = data.split(',');
+        for (let i = 0; i < parts.length; i++) {
+            const split = parts[i].split(':');
+            if (split.length !== 2) continue;
+            
+            const id = parseInt(split[0], 36);
+            const count = parseInt(split[1], 36);
+            const blockName = palette[id];
+            
+            for (let j = 0; j < count; j++) {
+                pixels.push(blockName);
+            }
+        }
+        return { width, height, pixels };
+    }
+
+    return {
+        width,
+        height,
+        getDecompressedData: decompress
+    };
+})();
+
+// ==============================
+// Block Art Generator Logic
+// ==============================
+
+let artData = null;
+let generating = false;
+let generateIndex = 0;
+
+let originX = 0;
+let originY = 0;
+let originZ = 0;
+
+// 1 tickあたりの生成数 (サーバー負荷に応じて調整可能)
+const BLOCKS_PER_TICK = 100;
+
+// ==============================
+// Player Command
+// ==============================
+playerCommand = (playerId, cmd) => {
+    if (cmd === "generate") {
+        
+        // アートデータ取得
+        artData = BlockArtData.getDecompressedData();
+        
+        // プレイヤー位置
+        const pos = api.getPosition(playerId);
+        
+        originX = Math.floor(pos[0]);
+        originY = Math.floor(pos[1]);
+        originZ = Math.floor(pos[2]);
+        
+        // 生成開始
+        generateIndex = 0;
+        generating = true;
+        
+        api.sendMessage(
+            playerId,
+            \`Generating \${artData.width}x\${artData.height} art...\`
+        );
+    }
+}
+
+// ==============================
+// Tick Event
+// ==============================
+tick = () => {
+    if (!generating || !artData) {
+        return;
+    }
+
+    const width = artData.width;
+    const height = artData.height;
+    const pixels = artData.pixels;
+    
+    const total = width * height;
+    
+    const end = Math.min(
+        generateIndex + BLOCKS_PER_TICK,
+        total
+    );
+
+    for (; generateIndex < end; generateIndex++) {
+        
+        const pixel = pixels[generateIndex];
+        
+        // 透明ピクセルの判定
+        if (
+            pixel === null ||
+            pixel === undefined ||
+            pixel === ""
+        ) {
+            continue;
+        }
+        
+        // 左上 → 右下 の順に配置
+        const px = generateIndex % width;
+        const pz = Math.floor(generateIndex / width);
+        
+        // X-Z平面に配置 (地面に描画)
+        const x = originX + px;
+        const y = originY;
+        const z = originZ + pz;
+        
+        api.setBlock(x, y, z, pixel);
+    }
+    
+    // 完了判定
+    if (generateIndex >= total) {
+        generating = false;
+        artData = null;
+        console.log("Block art generation complete.");
+    }
+}`;
+
+            outputCode.value = generatedCode;
+            outputSection.classList.remove('hidden');
+            
+            // スムーズスクロールで結果エリアへ
+            setTimeout(() => {
+                outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        });
+
+        // コピーボタン処理
+        copyBtn.addEventListener('click', () => {
+            outputCode.select();
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges(); // 選択状態を解除
+            
+            // ボタンの見た目変更 (成功状態)
+            const originalHTML = copyBtn.innerHTML;
+            copyBtn.innerHTML = `<i class="fa-solid fa-check"></i> コピーしました!`;
+            copyBtn.classList.remove('bg-slate-100', 'text-slate-700', 'hover:bg-slate-200');
+            copyBtn.classList.add('bg-emerald-100', 'text-emerald-700', 'hover:bg-emerald-200', 'shadow-sm', 'border', 'border-emerald-200');
+            
+            setTimeout(() => {
+                copyBtn.innerHTML = originalHTML;
+                copyBtn.classList.add('bg-slate-100', 'text-slate-700', 'hover:bg-slate-200');
+                copyBtn.classList.remove('bg-emerald-100', 'text-emerald-700', 'hover:bg-emerald-200', 'shadow-sm', 'border', 'border-emerald-200');
+            }, 2500);
+        });
+    </script>
+</body>
+</html>
