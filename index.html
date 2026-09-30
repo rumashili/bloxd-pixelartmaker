@@ -217,146 +217,239 @@
     </div>
 
     <script>
-        // パレット定義 (標準 49色)
         const rawPalette = {
-            "#8c2621": "Red Concrete",
-            "#d16e21": "Orange Concrete",
-            "#dbb33a": "Yellow Concrete",
-            "#6fa724": "Lime Concrete",
-            "#933f30": "Red Baked Clay",
-            "#ba652b": "Orange Baked Clay",
-            "#bc8a38": "Yellow Baked Clay",
-            "#80872d": "Lime Baked Clay",
-            "#4f6321": "Green Concrete",
-            "#3b9fbd": "Light Blue Concrete",
-            "#1d7b7f": "Cyan Concrete",
-            "#313685": "Blue Concrete",
-            "#1b2347": "Navy Concrete",
-            "#705f2d": "Green Baked Clay",
-            "#628086": "Light Blue Baked Clay",
-            "#516e63": "Cyan Baked Clay",
-            "#60486a": "Blue Baked Clay",
-            "#6b2793": "Purple Concrete",
-            "#a34099": "Magenta Concrete",
-            "#d1819c": "Pink Concrete",
-            "#644229": "Brown Concrete",
-            "#804071": "Purple Baked Clay",
-            "#9f4c75": "Magenta Baked Clay",
-            "#b86f72": "Pink Baked Clay",
-            "#7c4e34": "Brown Baked Clay",
-            "#d4d4d4": "White Concrete",
-            "#7f807a": "Light Gray Concrete",
-            "#3b4043": "Gray Concrete",
-            "#141519": "Black Concrete",
-            "#b69c90": "White Baked Clay",
-            "#8c7060": "Light Gray Baked Clay",
-            "#664e44": "Gray Baked Clay",
-            "#53382f": "Black Baked Clay",
-            "#b2776d": "Red Chalk",
-            "#d79b67": "Orange Chalk",
-            "#d9c071": "Yellow Chalk",
-            "#9fbe69": "Lime Chalk",
-            "#90996b": "Green Chalk",
-            "#80b8c3": "Light Blue Chalk",
-            "#70a6a1": "Cyan Chalk",
-            "#8181a8": "Blue Chalk",
-            "#a177ae": "Purple Chalk",
-            "#bf83b0": "Magenta Chalk",
-            "#d7a6ad": "Pink Chalk",
-            "#9d8771": "Brown Chalk",
-            "#d7d6d0": "White Chalk",
-            "#aca89f": "Light Gray Chalk",
-            "#858681": "Gray Chalk",
-            "#72716c": "Black Chalk"
+            "#161617": "Bedrock",
+            "#3C4192": "Blue Planks",
+            "#A89178": "Brown Chalk",
+            "#DAD7C7": "Chalk",
+            "#735136": "Brown Planks",
+            "#EBD07C": "Yellow Chalk",
+            "#79B4AE": "Cyan Chalk",
+            "#8F908A": "Gray Chalk",
+            "#9AA472": "Green Chalk",
+            "#AACC70": "Lime Chalk",
+            "#16171C": "Black Concrete",
+            "#B7B5AA": "Light Gray Chalk",
+            "#8AC8D3": "Light Blue Chalk",
+            "#CF8FBE": "Magenta Chalk",
+            "#18191D": "Black Planks",
+            "#E9B4BC": "Pink Chalk",
+            "#353A8F": "Blue Concrete",
+            "#E8A870": "Orange Chalk",
+            "#797872": "Black Chalk",
+            "#898AB3": "Blue Chalk",
+            "#AC80BB": "Purple Chalk",
+            "#E5E4DC": "White Chalk",
+            "#6D482B": "Brown Concrete",
+            "#C08074": "Red Chalk",
+            "#848688": "Gravel",
+            "#212222": "Block of Coal",
+            "#1E868A": "Cyan Concrete",
+            "#59E459": "Block of Emerald",
+            "#FEDD2C": "Block of Gold",
+            "#319397": "Cyan Planks",
+            "#397C66": "Dark Green Bricks",
+            "#617531": "Green Planks",
+            "#5A8A31": "Grass Block",
+            "#87634E": "Dirt",
+            "#A4AEB7": "Clay",
+            "#464C4F": "Gray Planks",
+            "#556A23": "Green Concrete",
+            "#3CD0C8": "Block of Diamond",
+            "#6BB7AC": "Green Stone",
+            "#404549": "Gray Concrete",
+            "#688B91": "Light Blue Baked Clay",
+            "#C7787B": "Pink Baked Clay",
+            "#965D43": "Baked Clay",
+            "#674D72": "Blue Baked Clay",
+            "#7DE2FC": "Ice",
+            "#9E4333": "Red Baked Clay",
+            "#C3A79A": "White Baked Clay",
+            "#AD527D": "Magenta Baked Clay",
+            "#786731": "Green Baked Clay",
+            "#D4D0C9": "Block of Iron",
+            "#57776C": "Cyan Baked Clay",
+            "#957868": "Light Gray Baked Clay",
+            "#888F2F": "Lime Baked Clay",
+            "#C9943B": "Yellow Baked Clay",
+            "#573B31": "Black Baked Clay",
+            "#C66C2E": "Orange Baked Clay",
+            "#865437": "Brown Baked Clay",
+            "#6D5348": "Gray Baked Clay",
+            "#8B447A": "Purple Baked Clay",
+            "#398885": "Spectral Leaves",
+            "#274814": "Cedar Leaves",
+            "#D49F2B": "Autumn Aspen Leaves",
+            "#279918": "Jungle Grass Block",
+            "#9D9D97": "Light Gray Planks",
+            "#8EC741": "Lime Planks",
+            "#77B326": "Lime Concrete",
+            "#405A9B": "Block of Lapis Lazuli",
+            "#FABADE": "Cherry Leaves",
+            "#CDE2B0": "Pear Leaves",
+            "#57BFDF": "Light Blue Planks",
+            "#286915": "Maple Leaves",
+            "#8AAA25": "Palm Leaves",
+            "#849433": "Plum Leaves",
+            "#32453B": "Pine Leaves",
+            "#40ACCD": "Light Blue Concrete",
+            "#8B8B86": "Light Gray Concrete",
+            "#5CB313": "Mango Leaves",
+            "#007F00": "Jungle Leaves",
+            "#5DA73B": "Aspen Leaves",
+            "#937043": "Palm Log",
+            "#612C28": "Dark Red Stone",
+            "#231631": "Obsidian",
+            "#4A3226": "Pine Log",
+            "#385071": "Spectral Log",
+            "#868C50": "Mango Log",
+            "#382430": "Cherry Log",
+            "#352610": "Cedar Log",
+            "#EE8938": "Orange Planks",
+            "#B953AF": "Magenta Planks",
+            "#646540": "Pear Log",
+            "#B045A5": "Magenta Concrete",
+            "#735B3A": "Maple Log",
+            "#858B92": "Messy Stone",
+            "#664F27": "Jungle Log",
+            "#715352": "Plum Log",
+            "#DF7622": "Orange Concrete",
+            "#E2E2FE": "Block of Moonstone",
+            "#968D5A": "Pear Wood Planks",
+            "#732A9D": "Purple Concrete",
+            "#4E3218": "Cedar Wood Planks",
+            "#AA8B58": "Maple Wood Planks",
+            "#A17953": "Jungle Wood Planks",
+            "#97312D": "Red Planks",
+            "#92635A": "Plum Wood Planks",
+            "#942824": "Red Concrete",
+            "#E48CA8": "Pink Concrete",
+            "#335E42": "Pine Grass Block",
+            "#F8A3BD": "Pink Planks",
+            "#C3B07C": "Aspen Wood Planks",
+            "#79329F": "Purple Planks",
+            "#F1B2CA": "Cherry Wood Planks",
+            "#D19546": "Palm Wood Planks",
+            "#755440": "Pine Wood Planks",
+            "#CFC16E": "Mango Wood Planks",
+            "#F8E59F": "Sand",
+            "#C96A23": "Red Sand",
+            "#AB2A24": "Red Wool",
+            "#FB97B7": "Pink Wool",
+            "#F9801D": "Orange Wool",
+            "#E3E4E4": "White Concrete",
+            "#842CB4": "Purple Wool",
+            "#C748BA": "Magenta Wool",
+            "#717A82": "Andesite",
+            "#EFF4FA": "Snow",
+            "#979791": "Light Gray Wool",
+            "#F5F5F6": "White Wool",
+            "#FBFBFB": "White Planks",
+            "#EAC03D": "Yellow Concrete",
+            "#996655": "Granite",
+            "#FECF39": "Yellow Wool",
+            "#E7E6E0": "Diorite",
+            "#7A4E2B": "Brown Wool",
+            "#189598": "Cyan Wool",
+            "#FBDB5C": "Yellow Planks",
+            "#1B1C21": "Black Wool",
+            "#878D94": "Stone",
+            "#5C741F": "Green Wool",
+            "#464C50": "Gray Wool",
+            "#3ABDE3": "Light Blue Wool",
+            "#3941A3": "Blue Wool",
+        "#80C51C": "Lime Wool"
+    };
+
+    // ====== 色空間変換・色差計算アルゴリズム ======
+
+    // 1. RGB から CIELAB色空間 への変換
+    function rgbToLab(r, g, b) {
+        let r_ = r / 255, g_ = g / 255, b_ = b / 255;
+        r_ = r_ > 0.04045 ? Math.pow((r_ + 0.055) / 1.055, 2.4) : r_ / 12.92;
+        g_ = g_ > 0.04045 ? Math.pow((g_ + 0.055) / 1.055, 2.4) : g_ / 12.92;
+        b_ = b_ > 0.04045 ? Math.pow((b_ + 0.055) / 1.055, 2.4) : b_ / 12.92;
+
+        let x = (r_ * 0.4124 + g_ * 0.3576 + b_ * 0.1805) * 100;
+        let y = (r_ * 0.2126 + g_ * 0.7152 + b_ * 0.0722) * 100;
+        let z = (r_ * 0.0193 + g_ * 0.1192 + b_ * 0.9505) * 100;
+
+        x /= 95.047;
+        y /= 100.000;
+        z /= 108.883;
+
+        x = x > 0.008856 ? Math.pow(x, 1/3) : (7.787 * x) + 16 / 116;
+        y = y > 0.008856 ? Math.pow(y, 1/3) : (7.787 * y) + 16 / 116;
+        z = z > 0.008856 ? Math.pow(z, 1/3) : (7.787 * z) + 16 / 116;
+
+        return {
+            L: (116 * y) - 16,
+            A: 500 * (x - y),
+            B: 200 * (y - z)
         };
+    }
 
-        // 1. RGB (0-255) から CIELAB (L*, a*, b*) 色空間への変換
-        function rgbToLab(r, g, b) {
-            let rL = r / 255, gL = g / 255, bL = b / 255;
-            rL = rL > 0.04045 ? Math.pow((rL + 0.055) / 1.055, 2.4) : rL / 12.92;
-            gL = gL > 0.04045 ? Math.pow((gL + 0.055) / 1.055, 2.4) : gL / 12.92;
-            bL = bL > 0.04045 ? Math.pow((bL + 0.055) / 1.055, 2.4) : bL / 12.92;
+    // 2. CIELAB (CIE76) 色差
+    function getDeltaE(lab1, lab2) {
+        const dL = lab1.L - lab2.L;
+        const dA = lab1.A - lab2.A;
+        const dB = lab1.B - lab2.B;
+        return Math.sqrt(dL * dL + dA * dA + dB * dB);
+    }
 
-            let x = (rL * 0.4124 + gL * 0.3576 + bL * 0.1805) / 0.95047;
-            let y = (rL * 0.2126 + gL * 0.7152 + bL * 0.0722) / 1.00000;
-            let z = (rL * 0.0193 + gL * 0.1192 + bL * 0.9505) / 1.08883;
-
-            const f = (t) => t > 0.008856 ? Math.cbrt(t) : (7.787 * t) + (16 / 116);
-            const fx = f(x), fy = f(y), fz = f(z);
-
-            return {
-                l: (116 * fy) - 16,
-                a: 500 * (fx - fy),
-                b: 200 * (fy - fz)
-            };
+    // 3. CIEDE2000 色差 (より人間に近い複雑なアルゴリズム)
+    function deltaE2000(lab1, lab2) {
+        const rad2deg = function(rad) { return 360 * rad / (2 * Math.PI); };
+        const deg2rad = function(deg) { return (2 * Math.PI) * deg / 360; };
+        const L1 = lab1.L, a1 = lab1.A, b1 = lab1.B;
+        const L2 = lab2.L, a2 = lab2.A, b2 = lab2.B;
+        const C1 = Math.sqrt(a1*a1 + b1*b1);
+        const C2 = Math.sqrt(a2*a2 + b2*b2);
+        const Cbar = (C1 + C2) / 2;
+        const G = 0.5 * (1 - Math.sqrt(Math.pow(Cbar, 7) / (Math.pow(Cbar, 7) + Math.pow(25, 7))));
+        const a1_prime = a1 * (1 + G);
+        const a2_prime = a2 * (1 + G);
+        const C1_prime = Math.sqrt(a1_prime*a1_prime + b1*b1);
+        const C2_prime = Math.sqrt(a2_prime*a2_prime + b2*b2);
+        const Cbar_prime = (C1_prime + C2_prime) / 2;
+        
+        let h1_prime = Math.atan2(b1, a1_prime);
+        if (h1_prime < 0) h1_prime += 2 * Math.PI;
+        h1_prime = rad2deg(h1_prime);
+        
+        let h2_prime = Math.atan2(b2, a2_prime);
+        if (h2_prime < 0) h2_prime += 2 * Math.PI;
+        h2_prime = rad2deg(h2_prime);
+        
+        let Hbar_prime = Math.abs(h1_prime - h2_prime) > 180 ? (h1_prime + h2_prime + 360) / 2 : (h1_prime + h2_prime) / 2;
+        let T = 1 - 0.17 * Math.cos(deg2rad(Hbar_prime - 30)) + 0.24 * Math.cos(deg2rad(2 * Hbar_prime)) + 0.32 * Math.cos(deg2rad(3 * Hbar_prime + 6)) - 0.20 * Math.cos(deg2rad(4 * Hbar_prime - 63));
+        let delta_h_prime = h2_prime - h1_prime;
+        if (Math.abs(h2_prime - h1_prime) > 180) {
+            if (h2_prime <= h1_prime) delta_h_prime += 360;
+            else delta_h_prime -= 360;
         }
+        let delta_H_prime = 2 * Math.sqrt(C1_prime * C2_prime) * Math.sin(deg2rad(delta_h_prime) / 2);
+        let delta_L_prime = L2 - L1;
+        let delta_C_prime = C2_prime - C1_prime;
+        let S_L = 1 + (0.015 * Math.pow(L1 + L2 - 100, 2)) / Math.sqrt(20 + Math.pow(L1 + L2 - 100, 2));
+        let S_C = 1 + 0.045 * Cbar_prime;
+        let S_H = 1 + 0.015 * Cbar_prime * T;
+        let delta_theta = 30 * Math.exp(-Math.pow((Hbar_prime - 275) / 25, 2));
+        let R_C = 2 * Math.sqrt(Math.pow(Cbar_prime, 7) / (Math.pow(Cbar_prime, 7) + Math.pow(25, 7)));
+        let R_T = -Math.sin(deg2rad(2 * delta_theta)) * R_C;
+        
+        const k_L = 1, k_C = 1, k_H = 1;
+        return Math.sqrt(
+            Math.pow(delta_L_prime / (k_L * S_L), 2) +
+            Math.pow(delta_C_prime / (k_C * S_C), 2) +
+            Math.pow(delta_H_prime / (k_H * S_H), 2) +
+            R_T * (delta_C_prime / (k_C * S_C)) * (delta_H_prime / (k_H * S_H))
+        );
+    }
 
-        // CIEDE2000 色差計算 (肌色・ニュートラル・青領域の歪みを補正する最高精度計算)
-        function deltaE2000(lab1, lab2) {
-            const L1 = lab1.l, a1 = lab1.a, b1 = lab1.b;
-            const L2 = lab2.l, a2 = lab2.a, b2 = lab2.b;
-
-            const avgL = (L1 + L2) / 2;
-            const C1 = Math.sqrt(a1 * a1 + b1 * b1);
-            const C2 = Math.sqrt(a2 * a2 + b2 * b2);
-            const avgC = (C1 + C2) / 2;
-
-            const avgC7 = Math.pow(avgC, 7);
-            const G = 0.5 * (1 - Math.sqrt(avgC7 / (avgC7 + Math.pow(25, 7))));
-
-            const a1p = a1 * (1 + G);
-            const a2p = a2 * (1 + G);
-
-            const C1p = Math.sqrt(a1p * a1p + b1 * b1);
-            const C2p = Math.sqrt(a2p * a2p + b2 * b2);
-            const avgCp = (C1p + C2p) / 2;
-
-            const h1p = (Math.atan2(b1, a1p) * 180 / Math.PI + 360) % 360;
-            const h2p = (Math.atan2(b2, a2p) * 180 / Math.PI + 360) % 360;
-
-            let avghp = 0;
-            if (Math.abs(h1p - h2p) > 180) {
-                avghp = (h1p + h2p + 360) / 2;
-            } else {
-                avghp = (h1p + h2p) / 2;
-            }
-
-            const T = 1 - 0.17 * Math.cos((avghp - 30) * Math.PI / 180)
-                        + 0.24 * Math.cos((2 * avghp) * Math.PI / 180)
-                        + 0.32 * Math.cos((3 * avghp + 6) * Math.PI / 180)
-                        - 0.20 * Math.cos((4 * avghp - 63) * Math.PI / 180);
-
-            let deltahp = h2p - h1p;
-            if (Math.abs(deltahp) > 180) {
-                if (h2p <= h1p) deltahp += 360;
-                else deltahp -= 360;
-            }
-
-            const deltaLp = L2 - L1;
-            const deltaCp = C2p - C1p;
-            const deltaHp = 2 * Math.sqrt(C1p * C2p) * Math.sin((deltahp / 2) * Math.PI / 180);
-
-            const Sl = 1 + (0.015 * Math.pow(avgL - 50, 2)) / Math.sqrt(20 + Math.pow(avgL - 50, 2));
-            const Sc = 1 + 0.045 * avgCp;
-            const Sh = 1 + 0.015 * avgCp * T;
-
-            const deltaTheta = 30 * Math.exp(-Math.pow((avghp - 275) / 25, 2));
-            const Rc = 2 * Math.sqrt(Math.pow(avgCp, 7) / (Math.pow(avgCp, 7) + Math.pow(25, 7)));
-            const Rt = -Math.sin((2 * deltaTheta) * Math.PI / 180) * Rc;
-
-            return Math.pow(deltaLp / Sl, 2) + Math.pow(deltaCp / Sc, 2) + Math.pow(deltaHp / Sh, 2) + Rt * (deltaCp / Sc) * (deltaHp / Sh);
-        }
-
-        // CIELAB Delta E (CIE76)
-        function getDeltaE(lab1, lab2) {
-            const dL = lab1.l - lab2.l;
-            const da = lab1.a - lab2.a;
-            const db = lab1.b - lab2.b;
-            return dL * dL + da * da + db * db;
-        }
-
-        // Redmean 色距離
-        function getRedmeanDistance(r1, g1, b1, r2, g2, b2) {
+    // パレットを処理しやすい形式に変換
+    // 4. Redmean 色距離
+    function getRedmeanDistance(r1, g1, b1, r2, g2, b2) {
             const rMean = (r1 + r2) / 2;
             const r = r1 - r2, g = g1 - g2, b = b1 - b2;
             return (2 + rMean / 256) * r * r + 4.0 * g * g + (2 + (255 - rMean) / 256) * b * b;
